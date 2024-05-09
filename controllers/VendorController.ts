@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { VendorLoginInput } from "../dto";
 import { findVendor } from "./AdminController";
-import { ValidatePassword } from "../utilities";
+import { GenerateSignature, ValidatePassword } from "../utilities";
 
 export const VendorLogin = async (
   req: Request,
@@ -18,7 +18,13 @@ export const VendorLogin = async (
       existingVendor.salt
     );
     if (validation) {
-      return res.status(200).json({ result: existingVendor });
+      const token = GenerateSignature({
+        _id: existingVendor._id,
+        email: existingVendor.email,
+        name: existingVendor.name,
+        foodTypes: existingVendor.foodType,
+      });
+      return res.status(200).json({ result: existingVendor, token: token });
     } else {
       return res
         .status(400)
@@ -27,3 +33,19 @@ export const VendorLogin = async (
   }
   return res.status(400).json({ message: "Email or password is incorrect" });
 };
+
+export const GetVendorProfile = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
+export const UpdateVendorProfile = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
+export const UpdateVendorService = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
